@@ -1,8 +1,161 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    .card {
+        border-radius: 15px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .best-time, .shoulder-season {
+        background-color: #e3f2fd;
+        padding: 8px 12px;
+        border-radius: 10px;
+        display: inline-block;
+        margin: 2px;
+        font-weight: bold;
+    }
+
+    .alert-section {
+        width: 100%;
+        padding: 10px 15px;
+        background-color: #fff8e1; /* Light Yellow */
+        border-bottom: 2px solid #ffcc00; /* Gold border */
+    }
+
+    .alert-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 800px;
+        margin: auto;
+    }
+
+    .alert-message {
+        font-size: 16px;
+        font-weight: bold;
+        color: #856404; /* Bootstrap Warning Text */
+    }
+</style>
+<div class="row justify-content-center mt-4">
+    <div class="col-3">
+        <label for="travellingTo" class="form-label">Travelling to?</label>
+        <input type="text" class="form-control" id="travellingTo" placeholder="Enter destination">
+    </div>
+
+    <!-- Boarding From -->
+    <div class="col-2">
+        <label for="boardingFrom" class="form-label">Boarding From</label>
+        <input type="text" class="form-control" id="boardingFrom" placeholder="Enter departure location">
+    </div>
+
+    <!-- Expected Travel Date -->
+    <div class="col-2">
+        <label for="expectedTravelDate" class="form-label">Expected travel Duration</label>
+        <select class="form-select" id="expectedTravelDuration">
+            <option selected disabled>Select</option>
+            <option value="2-3">2-3 days</option>
+            <option value="3-4">3-4 days</option>
+            <option value="4-5">4-5 days</option>
+            <option value="5-6">5-6 days</option>
+            <option value="6-7">6-7 days</option>
+            <option value="7-8">7-8 days</option>
+            <option value="8-9">8-9 days</option>
+            <option value="9-10">9-10 days</option>
+            <option value="10-12">10-12 days</option>
+            <option value="12+">12+ days</option>
+        </select>
+    </div>
+
+    <!-- Travelling With -->
+    <div class="col-2">
+        <label for="travellingWith" class="form-label">Travelling with</label>
+        <select class="form-select" id="travellingWith">
+            <option selected disabled>Select</option>
+            <option value="alone">Alone</option>
+            <option value="friends">With Friends</option>
+            <option value="family">With Family</option>
+            <option value="kids">With Kids</option>
+        </select>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="col-2 mt-4">
+        <button type="button" class="btn btn-primary mt-3" id="btnCreatePackage">Submit</button>
+    </div>
 </div>
+<div class="row justify-content-center mt-4 d-none" id="tripOverview">
+    <!-- 🚀 ALERT SECTION (First Section on the Page) -->
+    <div class="col-md-12">
+        <div class="alert-section" id="travelAlert">
+            <div class="alert-content">
+                <span class="alert-message"><i class="bi bi-exclamation-triangle-fill me-2"></i> <span id="alertMessage"></span></span>
+            </div>
+        </div>
+        <div class="card p-4">
+            <h2 class="text-center header-title">🌍 <span id="destinationName"></span>, <span id="countryName"></span></h2>
+            <hr>
+            <p class="lead" id="description"></p>
+
+            <h5 class="mt-3">📊 Annual Visitors:</h5>
+            <p id="annualVisitors"></p>
+
+            <h5 class="mt-3">🌟 Best Time to Visit:</h5>
+            <div id="bestTimeContainer"></div>
+
+            <h5 class="mt-3">🍂 Shoulder Season:</h5>
+            <div id="shoulderSeasonContainer"></div>
+
+            <h5 class="mt-3">🚫 Months to Avoid:</h5>
+            <div id="monthstoAvoidContainer"></div>
+        </div>
+    </div>
+    <!-- 🚆✈️🚖 How to Reach Section -->
+    <div class="card p-4 mt-4">
+        <h3 class="text-center header-title">🚆✈️🚖 How to Reach</h3>
+        <hr>
+
+        <!-- Train Route -->
+        <div id="trainRouteSection" style="display: none;">
+            <h5 class="mt-3">🚆 By Train:</h5>
+            <p id="trainAvailability"></p>
+            <p id="nearestRailwayStation"></p>
+        </div>
+
+        <!-- Train + Taxi/Bus -->
+        <div id="trainTaxiBusSection" style="display: none;">
+            <h5 class="mt-3">🚖 By Train + Taxi/Bus:</h5>
+            <p>Nearest Railway Station: <span id="trainTaxiBusStation"></span></p>
+            <p>Travel Time via Taxi/Bus: <span id="travelTimeByTaxiOrBus"></span></p>
+        </div>
+
+        <!-- Flight Options -->
+        <div id="flightSection" style="display: none;">
+            <h5 class="mt-3">✈️ By Flight:</h5>
+            <h6>🔹 Direct Flights</h6>
+            <ul id="directFlightsList"></ul>
+
+            <h6>🔹 Connecting Flights</h6>
+            <ul id="connectingFlightsList"></ul>
+        </div>
+
+        <!-- Recommended Travel Option -->
+        <div id="recommendedOptionSection" class="alert alert-info mt-3" style="display: none;">
+            <h5>✅ Recommended Travel Option:</h5>
+            <p id="recommendedMethod"></p>
+            <p id="recommendedReason"></p>
+        </div>
+    </div>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/js/genericutilities.js"></script>
+<script src="~/buildpackage.js?version=@DateTime.Now.Ticks"></script>

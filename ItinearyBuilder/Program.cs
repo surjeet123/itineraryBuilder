@@ -1,5 +1,8 @@
-var builder = WebApplication.CreateBuilder(args);
+using ItinearyBuilder.Business.Services;
 
+var builder = WebApplication.CreateBuilder(args);
+// Register OpenAIService with HttpClient
+builder.Services.AddHttpClient<OpenAIService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
